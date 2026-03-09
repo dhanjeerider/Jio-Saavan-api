@@ -297,6 +297,31 @@
     .sec-heading { font-family: 'Sora', sans-serif; font-size: 1.4rem; font-weight: 800; color: var(--accent2); margin: 40px 0 16px; display: flex; align-items: center; gap: 10px; }
     .sec-heading span { font-size: .75rem; font-weight: 600; background: var(--bg2); border: 1px solid var(--border); color: var(--muted); padding: 3px 10px; border-radius: 20px; }
 
+    /* ── Type/language badges ── */
+    .badge-type {
+      display: inline-block; font-size: .65rem;
+      background: rgba(108,99,255,.18); color: var(--accent2);
+      border: 1px solid rgba(108,99,255,.3); padding: 1px 6px;
+      border-radius: 4px; margin-top: 4px;
+    }
+    .badge-lang {
+      display: inline-block; font-size: .65rem;
+      background: var(--bg3); border: 1px solid var(--border);
+      color: var(--muted); padding: 1px 6px; border-radius: 4px;
+      margin-top: 4px; margin-left: 2px;
+    }
+
+    /* ── Load More button ── */
+    .btn-load-more {
+      background: var(--bg3); color: var(--text);
+      border: 1px solid var(--border); border-radius: 7px;
+      padding: 8px 20px; font-size: .8rem; font-weight: 700;
+      cursor: pointer; transition: background .2s, border-color .2s;
+      display: inline-flex; align-items: center; gap: 6px;
+    }
+    .btn-load-more:hover { background: var(--border); border-color: var(--accent); }
+    .btn-load-more:disabled { opacity: .55; pointer-events: none; }
+
     /* ── Footer ── */
     .footer { margin-top: 60px; padding: 24px 0; border-top: 1px solid var(--border); font-size: .78rem; color: var(--muted); text-align: center; }
   </style>
@@ -335,7 +360,7 @@
       <h1>🎵 Elite JioSaavn API</h1>
       <p>Interactive live documentation. Every endpoint below has a real example ID pre-filled. Click <strong>Try It</strong> to hit the live API and see both a syntax-highlighted JSON response and a rendered HTML preview.</p>
       <div class="kpi-row">
-        <div class="kpi"><strong>34</strong><span>Endpoints</span></div>
+        <div class="kpi"><strong>47</strong><span>Endpoints</span></div>
         <div class="kpi"><strong>v1.0</strong><span>Version</span></div>
         <div class="kpi"><strong>/api</strong><span>Base Path</span></div>
         <div class="kpi"><strong>Free</strong><span>Auth</span></div>
@@ -429,6 +454,14 @@ const ENDPOINTS = [
 
   // PODCASTS
   {
+    id: 'episodes-id', group: 'Podcasts', method: 'GET', path: '/api/episodes/{id}',
+    summary: 'Get podcast episode by ID',
+    desc: 'Retrieve a single podcast episode by its ID.',
+    params: [{ name: 'id', in: 'path', required: true, example: '27439090', desc: 'Episode ID' }],
+    defaultUrl: BASE + '/api/episodes/27439090',
+    renderer: 'generic',
+  },
+  {
     id: 'podcasts', group: 'Podcasts', method: 'GET', path: '/api/podcasts',
     summary: 'Get podcast/show by ID',
     desc: 'Retrieve a podcast show with paginated episodes.',
@@ -472,7 +505,7 @@ const ENDPOINTS = [
       { name: 'limit', in: 'query', required: false, example: '10', desc: 'Results per page' },
     ],
     defaultUrl: BASE + '/api/search/songs?query=Kesariya&page=1&limit=10',
-    renderer: 'songList',
+    renderer: 'songList', paginated: true,
   },
   {
     id: 'search-albums', group: 'Search', method: 'GET', path: '/api/search/albums',
@@ -483,7 +516,7 @@ const ENDPOINTS = [
       { name: 'page', in: 'query', required: false, example: '1', desc: 'Page' },
     ],
     defaultUrl: BASE + '/api/search/albums?query=Brahmastra&page=1',
-    renderer: 'cardList',
+    renderer: 'cardList', paginated: true,
   },
   {
     id: 'search-artists', group: 'Search', method: 'GET', path: '/api/search/artists',
@@ -494,7 +527,7 @@ const ENDPOINTS = [
       { name: 'page', in: 'query', required: false, example: '1', desc: 'Page' },
     ],
     defaultUrl: BASE + '/api/search/artists?query=Arijit+Singh&page=1',
-    renderer: 'cardList',
+    renderer: 'cardList', paginated: true,
   },
   {
     id: 'search-playlists', group: 'Search', method: 'GET', path: '/api/search/playlists',
@@ -505,7 +538,18 @@ const ENDPOINTS = [
       { name: 'page', in: 'query', required: false, example: '1', desc: 'Page' },
     ],
     defaultUrl: BASE + '/api/search/playlists?query=Bollywood+Hits&page=1',
-    renderer: 'cardList',
+    renderer: 'cardList', paginated: true,
+  },
+
+  {
+    id: 'search-top-query', group: 'Search', method: 'GET', path: '/api/search/top-query',
+    summary: 'Top query bucket',
+    desc: 'Search for the top query bucket — returns the single best result across all types.',
+    params: [
+      { name: 'query', in: 'query', required: true, example: 'Arijit Singh', desc: 'Search term' },
+    ],
+    defaultUrl: BASE + '/api/search/top-query?query=Arijit+Singh',
+    renderer: 'search',
   },
 
   // LYRICS
@@ -567,7 +611,7 @@ const ENDPOINTS = [
       { name: 'limit', in: 'query', required: false, example: '10', desc: 'Limit' },
     ],
     defaultUrl: BASE + '/api/artists/459320/songs?page=1&limit=10',
-    renderer: 'songList',
+    renderer: 'songList', paginated: true,
   },
   {
     id: 'artists-albums', group: 'Artists', method: 'GET', path: '/api/artists/{id}/albums',
@@ -578,7 +622,7 @@ const ENDPOINTS = [
       { name: 'page', in: 'query', required: false, example: '1', desc: 'Page' },
     ],
     defaultUrl: BASE + '/api/artists/459320/albums?page=1',
-    renderer: 'cardList',
+    renderer: 'cardList', paginated: true,
   },
   {
     id: 'artists-related', group: 'Artists', method: 'GET', path: '/api/artists/{id}/related',
@@ -692,17 +736,125 @@ const ENDPOINTS = [
     renderer: 'genres',
   },
 
+  // BROWSE
+  {
+    id: 'channels', group: 'Browse', method: 'GET', path: '/api/channels',
+    summary: 'Retrieve channels',
+    desc: 'Retrieve all browse/discover channels with artwork and metadata.',
+    params: [
+      { name: 'page', in: 'query', required: false, example: '1', desc: 'Page number' },
+      { name: 'limit', in: 'query', required: false, example: '20', desc: 'Items per page' },
+    ],
+    defaultUrl: BASE + '/api/channels?page=1&limit=20',
+    renderer: 'cardList', paginated: true,
+  },
+  {
+    id: 'channels-id', group: 'Browse', method: 'GET', path: '/api/channels/{id}',
+    summary: 'Retrieve channel detail',
+    desc: 'Retrieve detail for a specific channel by ID.',
+    params: [{ name: 'id', in: 'path', required: true, example: '43549018', desc: 'Channel ID' }],
+    defaultUrl: BASE + '/api/channels/43549018',
+    renderer: 'generic',
+  },
+  {
+    id: 'charts', group: 'Browse', method: 'GET', path: '/api/charts',
+    summary: 'Retrieve JioSaavn charts',
+    desc: 'Retrieve current charts/trending playlists on JioSaavn.',
+    params: [
+      { name: 'page', in: 'query', required: false, example: '1', desc: 'Page number' },
+      { name: 'limit', in: 'query', required: false, example: '20', desc: 'Items per page' },
+    ],
+    defaultUrl: BASE + '/api/charts?page=1&limit=20',
+    renderer: 'cardList', paginated: true,
+  },
+  {
+    id: 'discover', group: 'Browse', method: 'GET', path: '/api/discover',
+    summary: 'Retrieve discover channels',
+    desc: 'Retrieve discover/explore channel data.',
+    params: [],
+    defaultUrl: BASE + '/api/discover',
+    renderer: 'cardList',
+  },
+  {
+    id: 'moods', group: 'Browse', method: 'GET', path: '/api/moods',
+    summary: 'Retrieve mood channels',
+    desc: 'Retrieve mood-based music channels with artwork.',
+    params: [
+      { name: 'page', in: 'query', required: false, example: '1', desc: 'Page number' },
+      { name: 'limit', in: 'query', required: false, example: '20', desc: 'Items per page' },
+    ],
+    defaultUrl: BASE + '/api/moods?page=1&limit=20',
+    renderer: 'cardList', paginated: true,
+  },
+  {
+    id: 'music-plus', group: 'Browse', method: 'GET', path: '/api/music-plus',
+    summary: 'Retrieve music plus channels',
+    desc: 'Retrieve JioSaavn Music+ premium channel listing.',
+    params: [],
+    defaultUrl: BASE + '/api/music-plus',
+    renderer: 'cardList',
+  },
+
+  // HOME (additional)
+  {
+    id: 'home-modules', group: 'Home', method: 'GET', path: '/api/home/modules',
+    summary: 'Home feed module metadata',
+    desc: 'Retrieve home feed module metadata and configuration.',
+    params: [],
+    defaultUrl: BASE + '/api/home/modules',
+    renderer: 'generic',
+  },
+  {
+    id: 'home-promos', group: 'Home', method: 'GET', path: '/api/home/promos',
+    summary: 'Editorial promo groups',
+    desc: 'Retrieve editorial promo groups displayed on the home page.',
+    params: [],
+    defaultUrl: BASE + '/api/home/promos',
+    renderer: 'cardList',
+  },
+
   // RADIO
   {
-    id: 'radio', group: 'Radio', method: 'GET', path: '/api/radio/songs',
-    summary: 'Radio station songs',
-    desc: 'Retrieve songs for a radio station by station ID.',
+    id: 'radio-stations', group: 'Radio', method: 'GET', path: '/api/radio',
+    summary: 'Retrieve radio stations',
+    desc: 'Retrieve all available radio stations with artwork and metadata.',
     params: [
-      { name: 'id', in: 'query', required: true, example: '3379491', desc: 'Radio station ID' },
-      { name: 'count', in: 'query', required: false, example: '20', desc: 'Number of songs' },
+      { name: 'page', in: 'query', required: false, example: '1', desc: 'Page number' },
+      { name: 'limit', in: 'query', required: false, example: '20', desc: 'Items per page' },
     ],
-    defaultUrl: BASE + '/api/radio/songs?id=3379491&count=20',
-    renderer: 'songList',
+    defaultUrl: BASE + '/api/radio?page=1&limit=20',
+    renderer: 'cardList', paginated: true,
+  },
+  {
+    id: 'radio-id', group: 'Radio', method: 'GET', path: '/api/radio/{id}',
+    summary: 'Radio station detail',
+    desc: 'Retrieve a radio station detail payload by ID.',
+    params: [{ name: 'id', in: 'path', required: true, example: '3379491', desc: 'Radio station ID' }],
+    defaultUrl: BASE + '/api/radio/3379491',
+    renderer: 'generic',
+  },
+  {
+    id: 'radio-artists', group: 'Radio', method: 'GET', path: '/api/radio/artists',
+    summary: 'Artist radio recommendations',
+    desc: 'Retrieve artist radio station recommendations.',
+    params: [
+      { name: 'artist_id', in: 'query', required: false, example: '459320', desc: 'Artist ID' },
+      { name: 'page', in: 'query', required: false, example: '1', desc: 'Page number' },
+      { name: 'limit', in: 'query', required: false, example: '20', desc: 'Items per page' },
+    ],
+    defaultUrl: BASE + '/api/radio/artists?artist_id=459320&page=1&limit=20',
+    renderer: 'cardList', paginated: true,
+  },
+  {
+    id: 'radio-featured', group: 'Radio', method: 'GET', path: '/api/radio/featured',
+    summary: 'Featured radio stations',
+    desc: 'Retrieve featured/curated radio stations on JioSaavn.',
+    params: [
+      { name: 'page', in: 'query', required: false, example: '1', desc: 'Page number' },
+      { name: 'limit', in: 'query', required: false, example: '20', desc: 'Items per page' },
+    ],
+    defaultUrl: BASE + '/api/radio/featured?page=1&limit=20',
+    renderer: 'cardList', paginated: true,
   },
 ];
 
@@ -829,13 +981,17 @@ function renderSearch(data) {
 function renderCardList(data) {
   const arr = data.data?.results || data.data?.albums || data.data?.artists || data.data?.playlists || data.data || [];
   if (!Array.isArray(arr) || arr.length === 0) return '<p class="preview-empty">No items found.</p>';
-  return `<div class="data-grid">${arr.slice(0, 30).map(item => {
+  return `<div class="data-grid">${arr.map(item => {
     const img = bestImg(item.image);
-    const sub = item.type || item.language || '';
+    const title = item.name || item.title || '';
+    const type = item.type ? `<span class="badge-type">${escHtml(item.type)}</span>` : '';
+    const lang = item.language ? `<span class="badge-lang">${escHtml(item.language)}</span>` : '';
+    const sub = item.subtitle || item.description || item.dominantLanguage || '';
     return `<div class="data-card">
-      ${img ? `<img src="${img}" alt="" loading="lazy" onerror="this.style.display='none'">` : '<div style="aspect-ratio:1;background:var(--bg3);border-radius:7px"></div>'}
-      <div class="dc-title">${escHtml(item.name||item.title||'')}</div>
+      ${img ? `<img src="${img}" alt="${escHtml(title)}" loading="lazy" onerror="this.style.display='none'">` : '<div style="aspect-ratio:1;background:var(--bg3);border-radius:7px"></div>'}
+      <div class="dc-title">${escHtml(title)}</div>
       ${sub ? `<div class="dc-sub">${escHtml(sub)}</div>` : ''}
+      <div>${type}${lang}</div>
     </div>`;
   }).join('')}</div>`;
 }
@@ -987,6 +1143,11 @@ function buildCard(ep) {
       </table>
     </div>` : '<p style="color:var(--muted);font-size:.8rem;margin-bottom:16px">No parameters.</p>';
 
+  const paginateBtn = ep.paginated ? `
+    <div id="paginate-${ep.id}" style="display:none;margin-top:12px;text-align:center">
+      <button class="btn-load-more" id="loadmore-btn-${ep.id}" onclick="loadMore('${ep.id}','${ep.renderer}')">⬇ Load More</button>
+    </div>` : '';
+
   return `
   <div class="ep-card" id="ep-${ep.id}">
     <div class="ep-header" onclick="toggleCard('${ep.id}')">
@@ -1012,6 +1173,7 @@ function buildCard(ep) {
           <div>
             <div class="panel-header">HTML Preview</div>
             <div class="preview-box" id="preview-${ep.id}"><p class="preview-empty">Hit <strong>Try It</strong> to load…</p></div>
+            ${paginateBtn}
           </div>
         </div>
       </div>
@@ -1029,6 +1191,9 @@ function toggleCard(id) {
   tog.classList.toggle('open', !isOpen);
 }
 
+// ── Pagination state ─────────────────────────────────────────────────────
+const epPageState = {}; // { [id]: currentPage }
+
 // ── Fetch + render ────────────────────────────────────────────────────────
 async function tryIt(id, renderer) {
   const urlInput  = document.getElementById('url-' + id);
@@ -1036,6 +1201,7 @@ async function tryIt(id, renderer) {
   const jsonBox   = document.getElementById('json-' + id);
   const previewBox= document.getElementById('preview-' + id);
   const statusEl  = document.getElementById('status-' + id);
+  const paginateEl= document.getElementById('paginate-' + id);
   const url = urlInput.value.trim();
 
   btn.classList.add('loading');
@@ -1043,6 +1209,7 @@ async function tryIt(id, renderer) {
   jsonBox.innerHTML = '<span class="spinner"></span> Fetching…';
   previewBox.innerHTML = '<p class="preview-empty"><span class="spinner"></span></p>';
   statusEl.style.display = 'none';
+  if (paginateEl) paginateEl.style.display = 'none';
 
   try {
     const resp = await fetch(url);
@@ -1058,6 +1225,12 @@ async function tryIt(id, renderer) {
 
     // HTML Preview
     previewBox.innerHTML = renderPreview(renderer, json);
+
+    // Show pagination button if endpoint is paginated and returned results
+    if (paginateEl) {
+      epPageState[id] = 1;
+      paginateEl.style.display = '';
+    }
   } catch (err) {
     jsonBox.innerHTML = `<span style="color:var(--red)">Error: ${escHtml(err.message)}</span>`;
     previewBox.innerHTML = `<p class="preview-empty" style="color:var(--red)">${escHtml(err.message)}</p>`;
@@ -1067,6 +1240,63 @@ async function tryIt(id, renderer) {
   } finally {
     btn.classList.remove('loading');
     btn.innerHTML = '▶ Try It';
+  }
+}
+
+// ── Load More (pagination) ────────────────────────────────────────────────
+async function loadMore(id, renderer) {
+  if (epPageState[id] === null || epPageState[id] === undefined) return;
+  epPageState[id]++;
+  const page = epPageState[id];
+
+  const urlInput   = document.getElementById('url-' + id);
+  const previewBox = document.getElementById('preview-' + id);
+  const jsonBox    = document.getElementById('json-' + id);
+  const loadBtn    = document.getElementById('loadmore-btn-' + id);
+
+  // Build URL with incremented page
+  let urlStr = urlInput.value.trim();
+  try {
+    const urlObj = new URL(urlStr);
+    urlObj.searchParams.set('page', page);
+    urlStr = urlObj.toString();
+  } catch (_) {
+    // Fallback: try regex replace, or append the param
+    if (/[?&]page=\d+/.test(urlStr)) {
+      urlStr = urlStr.replace(/([?&]page=)\d+/, '$1' + page);
+    } else {
+      urlStr += (urlStr.includes('?') ? '&' : '?') + 'page=' + page;
+    }
+  }
+
+  loadBtn.disabled = true;
+  loadBtn.innerHTML = '<span class="spinner"></span> Loading…';
+
+  try {
+    const resp = await fetch(urlStr);
+    const json = await resp.json();
+
+    // Update JSON box to show latest page
+    jsonBox.innerHTML = highlightJSON(json);
+
+    // Append new items to preview
+    const newHtml = renderPreview(renderer, json);
+    const tempDiv = document.createElement('div');
+    tempDiv.innerHTML = newHtml;
+
+    // Try to merge into existing grid/list, else just append
+    const existingGrid = previewBox.querySelector('.data-grid');
+    const newGrid = tempDiv.querySelector('.data-grid');
+    if (existingGrid && newGrid) {
+      existingGrid.innerHTML += newGrid.innerHTML;
+    } else if (newHtml && !newHtml.includes('preview-empty')) {
+      previewBox.innerHTML += newHtml;
+    }
+  } catch (err) {
+    previewBox.innerHTML += `<p style="color:var(--red);font-size:.8rem;margin-top:8px">Error loading page ${page}: ${escHtml(err.message)}</p>`;
+  } finally {
+    loadBtn.disabled = false;
+    loadBtn.innerHTML = '⬇ Load More';
   }
 }
 
